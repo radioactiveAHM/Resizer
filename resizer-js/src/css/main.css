@@ -1,0 +1,73 @@
+main{
+    width: 500px;
+    /* height: 300px; */
+    background-color: rgba(255, 255, 255, 0.4);
+    padding: 10px;
+    transition: all 200ms linear;
+}
+
+.fileinput{
+    display: flex;
+    border-bottom: 2px solid rgba(128, 128, 128, 0.2);
+}
+.fileinput>input{
+    flex-grow: 1;
+}
+.fileinput>input::-webkit-file-upload-button{
+    border: 0;
+
+}
+.fileinput>img{
+    background-color: rgba(128, 128, 128, 0.2);
+    max-height: 150px;
+    max-width: 250px;
+    margin-bottom: 5px;
+    align-self: center;
+}
+
+.fileoutput{
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+.fileoutput>div>input{
+    border: none;
+    background-color: rgba(128, 128, 128, 0.4);
+    width: 60px;
+}
+.fileoutput>div>button{
+    border: none;
+}
+.fileoutput>a{
+    max-height: 150px;
+    max-width: 250px;
+    display: flex;
+    justify-content: end;
+}
+.fileoutput>a>img{
+    max-width: 100%;
+    max-height: 100%;
+}
+
+@media screen and (max-width: 500px) {
+    main{
+        width: 95%;
+    }
+    .fileinput{
+        gap: 10px;
+        flex-direction: column;
+    }
+    .fileoutput{
+        gap: 10px;
+        flex-direction: column;
+    }
+    .fileoutput>a{
+        max-height: unset;
+        max-width: unset;
+        align-items: center;
+        justify-content: center;
+    }
+    .fileoutput>a>img{
+        max-height: 30vh;
+    }
+}

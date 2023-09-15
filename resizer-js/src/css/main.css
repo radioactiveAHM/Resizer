@@ -30,13 +30,27 @@ main{
     display: flex;
     justify-content: space-between;
 }
-.fileoutput>div>input{
+.fileoutput>div>div{
+    display: flex;
+    gap: 10px;
+}
+.fileoutput>div>div>div{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.fileoutput>div>div>div>input{
     border: none;
     background-color: rgba(128, 128, 128, 0.4);
     width: 60px;
 }
 .fileoutput>div>button{
     border: none;
+
+}
+.fileoutput>div>div>div>select{
+    border: none;
+    background-color: rgba(128, 128, 128, 0.4);
 }
 .fileoutput>a{
     max-height: 150px;

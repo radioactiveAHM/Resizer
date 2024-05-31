@@ -12,6 +12,7 @@ main{
 }
 .fileinput>input{
     flex-grow: 1;
+    margin-bottom: 5px;
 }
 .fileinput>input::-webkit-file-upload-button{
     border: 0;
@@ -42,10 +43,11 @@ main{
 .fileoutput>div>div>div>input{
     border: none;
     background-color: rgba(128, 128, 128, 0.4);
-    width: 60px;
+    width: 130px;
 }
 .fileoutput>div>button{
     border: none;
+    margin-top: 5px;
 
 }
 .fileoutput>div>div>div>select{

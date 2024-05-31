@@ -2,16 +2,17 @@ import { useRef, useState } from "react";
 import { resize_advance } from "../core/resizer_core";
 
 function Main() {
-    const [imageLink, setImageLink] = useState({ "blob": new Blob(), "link": "" });
+    const [imageLink, setImageLink] = useState({ blob: new Blob(), link: "" });
     const [resizedimageLink, setResizedimageLink] = useState("");
+    const [rangers, setRangers] = useState({BlurV: 0.0, BrightenV: 0})
 
-    let file = useRef();
+    const file = useRef();
     
     // I'm too lazy to setup a controller...
-    let Width = useRef();
-    let Height = useRef();
-    let Resize_mode = useRef();
-    let Filter = useRef();
+    const Width = useRef();
+    const Height = useRef();
+    const Resize_mode = useRef();
+    const Filter = useRef();
 
     async function getBuffer() {
         // get image buffer
@@ -23,24 +24,34 @@ function Main() {
         });
     }
 
-    // async function resizer_fn() {
-    //     let newbuff = resize(new Uint8Array(await imageLink.blob.arrayBuffer()), Width.current.value || 500, Height.current.value || 500);
-    //     setResizedimageLink(URL.createObjectURL(new Blob([newbuff], { type: "image/png" })));
-    // }
     async function resizer_advance_fn() {
+        alert("Starting")
         // resize modes => resize , resize_exact , resize_to_fill
         // filter types => CatmullRom , Gaussian , Lanczos3 , Nearest , Triangle
-        let newbuff = resize_advance(
+        const newbuff = resize_advance(
             new Uint8Array(await imageLink.blob.arrayBuffer()), Width.current.value || 500, Height.current.value || 500,
-            Resize_mode.current.value , Filter.current.value
+            Resize_mode.current.value , Filter.current.value, rangers.BlurV, rangers.BrightenV
         );
         setResizedimageLink(URL.createObjectURL(new Blob([newbuff], { type: "image/png" })));
+    }
+
+    function range_val_controller(event){
+        // event.target.value
+        if (event.target.id === "blur"){
+            setRangers((prev)=>{
+                return {...prev, BlurV:event.target.value}
+            })
+        }else if (event.target.id === "brighten"){
+            setRangers((prev)=>{
+                return {...prev, BrightenV:event.target.value}
+            })
+        }
     }
     return (
         <main className="round">
             <div className="fileinput">
                 <input type="file" accept="image/.png, .jpg, .jpeg" ref={file} onChange={getBuffer} />
-                <img src={imageLink.link} />
+                <img src={imageLink.link} alt=""/>
             </div>
             <div className="fileoutput">
                 <div>
@@ -50,6 +61,8 @@ function Main() {
                             <label htmlFor="Height">Height</label>
                             <label htmlFor="Resize_type">Resize type</label>
                             <label htmlFor="Filters">Filters</label>
+                            <label htmlFor="blur">{`Blur(${rangers.BlurV})`}</label>
+                            <label htmlFor="brighten">{`Bright(${rangers.BrightenV})`}</label>
                         </div>
                         <div>
                             <input type="number" id="Width" ref={Width}/>
@@ -66,11 +79,13 @@ function Main() {
                                 <option value="Nearest">Nearest</option>
                                 <option value="Triangle">Triangle</option>
                             </select>
+                            <input type="range" id="blur" min="0.0" max="5.0" step="0.1" value={rangers.BlurV} onChange={range_val_controller}/>
+                            <input type="range" id="brighten" min="-50" max="50" step="5" value={rangers.BrightenV} onChange={range_val_controller}/>
                         </div>
                     </div>
-                    <button onClick={resizer_advance_fn}>resize</button>
+                    <button type="button" onClick={resizer_advance_fn}>resize</button>
                 </div>
-                <a target="_blank" rel="noreferrer" href={resizedimageLink}><img src={resizedimageLink} /></a>
+                <a target="_blank" rel="noreferrer" href={resizedimageLink}><img src={resizedimageLink} alt=""/></a>
             </div>
         </main>
     )

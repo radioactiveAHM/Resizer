@@ -1,12 +1,14 @@
-import Main from "./main/Main"
+import Main from "./main/Main";
 
-function App() {
-
-  return (
-    <>
-      <Main/>
-    </>
-  )
+export default function App() {
+	return (
+		<>
+			<Main />
+			<div id="info">
+				<i>No Uploads or Downloads Required</i>
+				<hr />
+				<i>Developed by <a href="https://github.com/radioactiveAHM">@radioactiveAHM</a></i>
+			</div>
+		</>
+	);
 }
-
-export default App

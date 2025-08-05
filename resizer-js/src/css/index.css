@@ -18,3 +18,14 @@ body>div{
     align-items: center;
     justify-content: center;
 }
+
+/* info dev */
+#info{
+    position: absolute;
+    bottom: 5px;
+    color: rgba(255, 255, 255, 0.5);
+
+}
+#info>*>a {
+    color: rgba(255, 255, 255, 0.5);
+}

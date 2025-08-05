@@ -4,8 +4,7 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub extern  "C" fn resize_advance(buff: &[u8],w: u32,h: u32,resize_mode: &str,filter: &str,blur: f32,brighten: i32) -> Vec<u8> {
-    let resized_buff = advance_resizer_core(buff, w, h, resize_mode, filter, blur, brighten);
-    resized_buff.get_ref().to_owned()
+    advance_resizer_core(buff, w, h, resize_mode, filter, blur, brighten)
 }
 
 fn filter_pick(filter: &str) -> image::imageops::FilterType {
@@ -19,7 +18,7 @@ fn filter_pick(filter: &str) -> image::imageops::FilterType {
     }
 }
 
-fn advance_resizer_core(imgbuff: &[u8],w: u32,h: u32,resize_mode: &str,filter: &str,blur: f32,brighten: i32) -> std::io::Cursor<Vec<u8>> {
+fn advance_resizer_core(imgbuff: &[u8],w: u32,h: u32,resize_mode: &str,filter: &str,blur: f32,brighten: i32) -> Vec<u8> {
     let mut img = image::load_from_memory(&imgbuff).unwrap();
     img = match resize_mode {
         "resize" => img.resize(w, h, filter_pick(filter)),
@@ -36,7 +35,7 @@ fn advance_resizer_core(imgbuff: &[u8],w: u32,h: u32,resize_mode: &str,filter: &
         img = img.brighten(brighten);
     }
 
-    let mut wt = std::io::Cursor::new(Vec::new());
+    let mut wt = std::io::Cursor::new(Vec::with_capacity(imgbuff.len()));
     img.write_to(&mut wt, image::ImageFormat::Png).unwrap();
-    wt
+    wt.into_inner().to_vec()
 }

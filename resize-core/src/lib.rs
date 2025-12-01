@@ -49,7 +49,7 @@ fn advance_resizer_core(
         img = img.brighten(brighten);
     }
 
-    let mut bw = std::io::BufWriter::with_capacity(1024 * 1024, std::io::Cursor::new(Vec::new()));
-    img.write_to(&mut bw, image::ImageFormat::Png)?;
-    Ok(bw.buffer().to_owned())
+    let mut buf = std::io::Cursor::new(Vec::new());
+    img.write_to(&mut buf, image::ImageFormat::Png)?;
+    Ok(buf.into_inner())
 }

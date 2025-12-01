@@ -9,6 +9,7 @@ main{
 .fileinput{
     display: flex;
     border-bottom: 2px solid rgba(128, 128, 128, 0.2);
+    overflow: hidden;
 }
 .fileinput>input{
     flex-grow: 1;
@@ -30,6 +31,7 @@ main{
     margin-top: 5px;
     display: flex;
     justify-content: space-between;
+    gap: 5px;
 }
 .fileoutput>div>div{
     display: flex;

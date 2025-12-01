@@ -1,10 +1,16 @@
 mod utils;
 
-use wasm_bindgen::prelude::*;
-
-#[wasm_bindgen]
-pub extern  "C" fn resize_advance(buff: &[u8],w: u32,h: u32,resize_mode: &str,filter: &str,blur: f32,brighten: i32) -> Vec<u8> {
-    advance_resizer_core(buff, w, h, resize_mode, filter, blur, brighten)
+#[wasm_bindgen::prelude::wasm_bindgen]
+pub fn resize_advance(
+    buff: &[u8],
+    w: u32,
+    h: u32,
+    resize_mode: &str,
+    filter: &str,
+    blur: f32,
+    brighten: i32,
+) -> Option<Vec<u8>> {
+    advance_resizer_core(buff, w, h, resize_mode, filter, blur, brighten).ok()
 }
 
 fn filter_pick(filter: &str) -> image::imageops::FilterType {
@@ -18,8 +24,16 @@ fn filter_pick(filter: &str) -> image::imageops::FilterType {
     }
 }
 
-fn advance_resizer_core(imgbuff: &[u8],w: u32,h: u32,resize_mode: &str,filter: &str,blur: f32,brighten: i32) -> Vec<u8> {
-    let mut img = image::load_from_memory(&imgbuff).unwrap();
+fn advance_resizer_core(
+    imgbuff: &[u8],
+    w: u32,
+    h: u32,
+    resize_mode: &str,
+    filter: &str,
+    blur: f32,
+    brighten: i32,
+) -> image::error::ImageResult<Vec<u8>> {
+    let mut img = image::load_from_memory(imgbuff)?;
     img = match resize_mode {
         "resize" => img.resize(w, h, filter_pick(filter)),
         "resize_exact" => img.resize_exact(w, h, filter_pick(filter)),
@@ -35,7 +49,7 @@ fn advance_resizer_core(imgbuff: &[u8],w: u32,h: u32,resize_mode: &str,filter: &
         img = img.brighten(brighten);
     }
 
-    let mut wt = std::io::Cursor::new(Vec::with_capacity(imgbuff.len()));
-    img.write_to(&mut wt, image::ImageFormat::Png).unwrap();
-    wt.into_inner().to_vec()
+    let mut bw = std::io::BufWriter::with_capacity(1024 * 1024, std::io::Cursor::new(Vec::new()));
+    img.write_to(&mut bw, image::ImageFormat::Png)?;
+    Ok(bw.buffer().to_owned())
 }

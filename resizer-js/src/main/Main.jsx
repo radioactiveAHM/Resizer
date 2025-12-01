@@ -2,13 +2,12 @@ import { useRef, useState } from "react";
 import { resize_advance } from "../core/resizer_core.js";
 
 export default function Main() {
-	const [imageLink, setImageLink] = useState({ blob: new Blob(), link: "" });
-	const [resizedimageLink, setResizedimageLink] = useState("");
+	const [imageLink, setImageLink] = useState({ blob: new Blob(), link: null });
+	const [resizedimageLink, setResizedimageLink] = useState(null);
 	const [rangers, setRangers] = useState({ BlurV: 0.0, BrightenV: 0 });
 
 	const file = useRef();
 
-	// I'm too lazy to setup a controller...
 	const Width = useRef();
 	const Height = useRef();
 	const Resize_mode = useRef();
@@ -39,9 +38,14 @@ export default function Main() {
 			rangers.BlurV,
 			rangers.BrightenV,
 		);
-		setResizedimageLink(
-			URL.createObjectURL(new Blob([newbuff], { type: "image/png" })),
-		);
+
+		if (newbuff === null) {
+			alert("resize failed");
+		} else {
+			setResizedimageLink(
+				URL.createObjectURL(new Blob([newbuff], { type: "image/png" })),
+			);
+		}
 	}
 
 	function range_val_controller(event) {
@@ -61,7 +65,7 @@ export default function Main() {
 			<div className="fileinput">
 				<input
 					type="file"
-					accept="image/.png, .jpg, .jpeg"
+					accept="image/*"
 					ref={file}
 					onChange={getBuffer}
 				/>

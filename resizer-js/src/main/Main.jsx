@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
-import { resize_advance } from "../core/resizer_core.js";
 
 export default function Main() {
+
 	const [imageLink, setImageLink] = useState({ blob: new Blob(), link: null });
 	const [resizedimageLink, setResizedimageLink] = useState(null);
 	const [rangers, setRangers] = useState({ BlurV: 0.0, BrightenV: 0 });
@@ -12,6 +12,9 @@ export default function Main() {
 	const Height = useRef();
 	const Resize_mode = useRef();
 	const Filter = useRef();
+
+	const loader_div = document.getElementById("loader");
+	const main_block = document.getElementById("main");
 
 	async function getBuffer() {
 		// get image buffer
@@ -25,27 +28,46 @@ export default function Main() {
 		});
 	}
 
-	async function resizer_advance_fn() {
-		alert("Starting");
-		// resize modes => resize , resize_exact , resize_to_fill
-		// filter types => CatmullRom , Gaussian , Lanczos3 , Nearest , Triangle
-		const newbuff = resize_advance(
-			new Uint8Array(await imageLink.blob.arrayBuffer()),
-			Width.current.value || 500,
-			Height.current.value || 500,
-			Resize_mode.current.value,
-			Filter.current.value,
-			rangers.BlurV,
-			rangers.BrightenV,
-		);
 
-		if (newbuff === null) {
+	function showloader(bool) {
+		if (bool) {
+			loader_div.style.display = "block";
+			// filter: blur(5px);
+			main_block.style.filter = "blur(5px)";
+		} else {
+			loader_div.style.display = "none";
+			main_block.style.filter = "none";
+		}
+	}
+
+	const worker = new Worker(new URL("./worker.js", import.meta.url), {
+		type: "module",
+	});
+	worker.onmessage = (event) => {
+		showloader(false);
+		if (event.data === null) {
 			alert("resize failed");
 		} else {
 			setResizedimageLink(
-				URL.createObjectURL(new Blob([newbuff], { type: "image/png" })),
+				URL.createObjectURL(
+					new Blob([event.data], { type: imageLink.blob.type }),
+				),
 			);
 		}
+	};
+
+	async function resizer_advance_fn() {
+		showloader(true);
+
+		worker.postMessage({
+			buf: new Uint8Array(await imageLink.blob.arrayBuffer()),
+			w: Width.current.value || 500,
+			h: Height.current.value || 500,
+			rm: Resize_mode.current.value,
+			f: Filter.current.value,
+			blur: rangers.BlurV,
+			bright: rangers.BrightenV,
+		});
 	}
 
 	function range_val_controller(event) {
@@ -61,14 +83,9 @@ export default function Main() {
 		}
 	}
 	return (
-		<main className="round">
+		<main className="round" id="main">
 			<div className="fileinput">
-				<input
-					type="file"
-					accept="image/*"
-					ref={file}
-					onChange={getBuffer}
-				/>
+				<input type="file" accept="image/*" ref={file} onChange={getBuffer} />
 				<img src={imageLink.link} alt="" />
 			</div>
 			<div className="fileoutput">

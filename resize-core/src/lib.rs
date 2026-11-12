@@ -33,7 +33,9 @@ fn advance_resizer_core(
     blur: f32,
     brighten: i32,
 ) -> image::error::ImageResult<Vec<u8>> {
-    let mut img = image::load_from_memory(imgbuff)?;
+    let img_format = image::guess_format(imgbuff)?;
+    let mut img = image::load_from_memory_with_format(imgbuff, img_format)?;
+
     img = match resize_mode {
         "resize" => img.resize(w, h, filter_pick(filter)),
         "resize_exact" => img.resize_exact(w, h, filter_pick(filter)),
@@ -50,6 +52,6 @@ fn advance_resizer_core(
     }
 
     let mut buf = std::io::Cursor::new(Vec::new());
-    img.write_to(&mut buf, image::ImageFormat::Png)?;
+    img.write_to(&mut buf, img_format)?;
     Ok(buf.into_inner())
 }

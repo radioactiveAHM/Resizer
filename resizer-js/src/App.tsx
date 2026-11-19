@@ -1,13 +1,16 @@
-import Main from "./main/Main";
+import Main from "./Main"
+
+import "./css/index.css"
+import "./css/loader.css"
+import "./css/main.css"
+import "./css/package.css"
 
 export default function App() {
 	return (
 		<>
-			<div class="loader" id="loader"></div>
 			<Main />
 			<div id="info">
 				<i>No Uploads or Downloads Required</i>
-				<hr />
 				<i>
 					Developed by{" "}
 					<a href="https://github.com/radioactiveAHM">@radioactiveAHM</a>

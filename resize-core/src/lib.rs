@@ -9,8 +9,10 @@ pub fn resize_advance(
     filter: &str,
     blur: f32,
     brighten: i32,
+    format: &str,
+    quality: u8
 ) -> Option<Vec<u8>> {
-    advance_resizer_core(buff, w, h, resize_mode, filter, blur, brighten).ok()
+    advance_resizer_core(buff, w, h, resize_mode, filter, blur, brighten, format, quality).ok()
 }
 
 fn filter_pick(filter: &str) -> image::imageops::FilterType {
@@ -32,8 +34,10 @@ fn advance_resizer_core(
     filter: &str,
     blur: f32,
     brighten: i32,
+    format: &str,
+    quality: u8
 ) -> image::error::ImageResult<Vec<u8>> {
-    let img_format = image::guess_format(imgbuff)?;
+    let mut img_format: image::ImageFormat = image::guess_format(imgbuff)?;
     let mut img = image::load_from_memory_with_format(imgbuff, img_format)?;
 
     img = match resize_mode {
@@ -51,7 +55,23 @@ fn advance_resizer_core(
         img = img.brighten(brighten);
     }
 
+    img_format = match format {
+        "image/jpeg" => image::ImageFormat::Jpeg,
+        "image/png" => image::ImageFormat::Png,
+        "image/webp" => image::ImageFormat::WebP,
+        _ => return Err(image::ImageError::Unsupported(image::error::ImageFormatHint::Unknown.into()))
+    };
+
     let mut buf = std::io::Cursor::new(Vec::new());
-    img.write_to(&mut buf, img_format)?;
+
+    match img_format {
+        image::ImageFormat::Jpeg => {
+            image::codecs::jpeg::JpegEncoder::new_with_quality(&mut buf, quality).encode_image(&img)?;
+        }
+        _ => {
+            img.write_to(&mut buf, img_format)?;
+        }
+    }
+
     Ok(buf.into_inner())
 }

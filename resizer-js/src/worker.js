@@ -1,4 +1,4 @@
-import { resize_advance } from "../core/resizer_core.js";
+import { resize_advance } from "./core/resizer_core.js";
 
 self.onmessage = (event) => {
 	const input = event.data;
@@ -11,6 +11,8 @@ self.onmessage = (event) => {
 		input.f,
 		input.blur,
 		input.bright,
+		input.format,
+		input.q
 	);
 
 	self.postMessage(result);

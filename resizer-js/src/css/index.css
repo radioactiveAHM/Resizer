@@ -23,6 +23,8 @@ body>div{
 #info{
     position: absolute;
     bottom: 5px;
+    display: flex;
+    flex-direction: column;
     color: rgba(255, 255, 255, 0.5);
 
 }
